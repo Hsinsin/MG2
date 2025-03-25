@@ -1792,32 +1792,31 @@ class LatentDiffusion(DDPM):
     def save_waveform(self, waveform, savepath, name="outwav"):
         for i in range(waveform.shape[0]):
             max_filename_length = 100
-            if type(name) is str:
-                # max_filename_length = 25 
+
+            if isinstance(name, str):
                 truncated_name = self.truncate_filename(name, max_filename_length)
-                
-                path = os.path.join(
-                    savepath, "%s_%s_%s.wav" % (self.global_step, i, truncated_name)
-                )
+                filename = f"{self.global_step}_{i}_{truncated_name}.wav"
 
-            elif type(name) is list:
-                # max_filename_length = 25  
-                truncated_basename = self.truncate_filename(os.path.basename(name[i]), max_filename_length)
-
-                if ".wav" in truncated_basename:
-                    truncated_basename = truncated_basename.split(".")[0]
-                path = os.path.join(
-                    savepath,
-                    "%s.wav" % truncated_basename,
-                )
-            
+            elif isinstance(name, list):
+                if i < len(name):
+                    raw_name = os.path.basename(name[i])
+                    truncated_basename = self.truncate_filename(raw_name, max_filename_length)
+                    if ".wav" in truncated_basename:
+                        truncated_basename = truncated_basename.split(".")[0]
+                    filename = f"{truncated_basename}.wav"
+                else: # index out of range
+                    filename = f"{self.global_step}_{i}_outwav.wav"
+                    print(f"[Warning] name list index {i} out of range, using the default filename: {filename}")
             else:
-                raise NotImplementedError
+                raise NotImplementedError(f"Unsupported name type: {type(name)}")
+
+            path = os.path.join(savepath, filename)
+
             todo_waveform = waveform[i, 0]
             todo_waveform = (
                 todo_waveform / np.max(np.abs(todo_waveform))
-            ) * 0.8  # Normalize the energy of the generation output
-            
+            ) * 0.8  # Normalize energy
+
             sf.write(path, todo_waveform, samplerate=self.sampling_rate)
             
     # def save_waveform(self, waveform, savepath, name="outwav"):
