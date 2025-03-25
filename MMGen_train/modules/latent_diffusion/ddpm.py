@@ -1791,8 +1791,9 @@ class LatentDiffusion(DDPM):
         return filename
     def save_waveform(self, waveform, savepath, name="outwav"):
         for i in range(waveform.shape[0]):
+            max_filename_length = 100
             if type(name) is str:
-                max_filename_length = 25 
+                # max_filename_length = 25 
                 truncated_name = self.truncate_filename(name, max_filename_length)
                 
                 path = os.path.join(
@@ -1800,7 +1801,7 @@ class LatentDiffusion(DDPM):
                 )
 
             elif type(name) is list:
-                max_filename_length = 25  
+                # max_filename_length = 25  
                 truncated_basename = self.truncate_filename(os.path.basename(name[i]), max_filename_length)
 
                 if ".wav" in truncated_basename:
