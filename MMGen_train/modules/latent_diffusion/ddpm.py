@@ -1791,22 +1791,36 @@ class LatentDiffusion(DDPM):
         return filename
     def save_waveform(self, waveform, savepath, name="outwav"):
         for i in range(waveform.shape[0]):
-            max_filename_length = 100
+            max_filename_length = 20
 
             if isinstance(name, str):
                 truncated_name = self.truncate_filename(name, max_filename_length)
                 filename = f"{self.global_step}_{i}_{truncated_name}.wav"
 
             elif isinstance(name, list):
-                if i < len(name):
-                    raw_name = os.path.basename(name[i])
-                    truncated_basename = self.truncate_filename(raw_name, max_filename_length)
-                    if ".wav" in truncated_basename:
-                        truncated_basename = truncated_basename.split(".")[0]
-                    filename = f"{truncated_basename}.wav"
-                else: # index out of range
-                    filename = f"{self.global_step}_{i}_outwav.wav"
-                    print(f"[Warning] name list index {i} out of range, using the default filename: {filename}")
+                name_idx = i if i < len(name) else -1
+                raw_name = os.path.basename(name[name_idx])
+
+                if i >= len(name):
+                    print(f"[Warning] name list index {i} out of range, fallback to last name in list: {raw_name}")
+
+                truncated_basename = self.truncate_filename(raw_name, max_filename_length)
+
+                if truncated_basename.lower().endswith(".wav"):
+                    truncated_basename = truncated_basename[:-4]
+
+                filename = f"{truncated_basename}.wav"
+
+            # elif isinstance(name, list):
+            #     if i < len(name):
+            #         raw_name = os.path.basename(name[i])
+            #         truncated_basename = self.truncate_filename(raw_name, max_filename_length)
+            #         if ".wav" in truncated_basename:
+            #             truncated_basename = truncated_basename.split(".")[0]
+            #         filename = f"{truncated_basename}.wav"
+            #     else: # index out of range
+            #         filename = f"{self.global_step}_{i}_outwav.wav"
+            #         print(f"[Warning] name list index {i} out of range, using the default filename: {filename}")
             else:
                 raise NotImplementedError(f"Unsupported name type: {type(name)}")
 

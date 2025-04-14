@@ -6,6 +6,7 @@ MMGen_train/modules/clmp/melody_encoder/melody_encoder/test_data/*
 MMGen_train/modules/latent_diffusion/scann/*
 MMGen_train/modules/latent_diffusion/*.npy
 MMGen_train/modules/latent_diffusion/*.faiss
+data/checkpoints/roberta-base/*
 data/checkpoints/*.checkpoints
 data/checkpoints/*.json
 data/checkpoints/*.faiss
